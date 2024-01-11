@@ -10,7 +10,7 @@ class BookParser(ABC):
         """
         Parse and returns new books from source.
         :return: data frame of books with schema:
-        timestamp, store, title, authors, publisher, description, price.
+        timestamp, store, title, authors, publisher, description, status_id, rating, price.
         If no books are found it will return an empty data frame.
         """
         pass
@@ -20,7 +20,7 @@ class BookParser(ABC):
         """
         Parse and returns popular books from source.
         :return: data frame of books with schema:
-        timestamp, store, title, authors, publisher, description, price.
+        timestamp, store, title, authors, publisher, description, status_id, rating, price.
         If no books are found it will return an empty data frame.
         """
         pass
@@ -30,7 +30,7 @@ class BookParser(ABC):
         """
         Parse and returns books with discount.
         :return: data frame of books with schema:
-        timestamp, store, title, authors, publisher, description, price.
+        timestamp, store, title, authors, publisher, description, status_id, rating, price.
         If no books are found it will return an empty data frame.
         """
         pass
