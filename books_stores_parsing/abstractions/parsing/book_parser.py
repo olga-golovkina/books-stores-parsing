@@ -4,13 +4,20 @@ from pandas import DataFrame
 
 
 class BookParser(ABC):
-
     @abstractmethod
     def parse_new_books(self) -> DataFrame:
         """
         Parse and returns new books from source.
         :return: data frame of books with schema:
-        timestamp, store, title, authors, publisher, description, status_id, rating, price.
+        timestamp,
+        store,
+        title,
+        author,
+        isbn,
+        description,
+        rating,
+        price,
+        type_id.
         If no books are found it will return an empty data frame.
         """
         pass
@@ -20,7 +27,15 @@ class BookParser(ABC):
         """
         Parse and returns popular books from source.
         :return: data frame of books with schema:
-        timestamp, store, title, authors, publisher, description, status_id, rating, price.
+        timestamp,
+        store,
+        title,
+        author,
+        isbn,
+        description,
+        rating,
+        price,
+        type_id.
         If no books are found it will return an empty data frame.
         """
         pass
@@ -30,7 +45,15 @@ class BookParser(ABC):
         """
         Parse and returns books with discount.
         :return: data frame of books with schema:
-        timestamp, store, title, authors, publisher, description, status_id, rating, price.
+        timestamp,
+        store,
+        title,
+        author,
+        isbn,
+        description,
+        rating,
+        price,
+        type_id.
         If no books are found it will return an empty data frame.
         """
         pass
