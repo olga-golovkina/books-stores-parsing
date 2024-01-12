@@ -59,7 +59,7 @@ class BookParser(ABC):
         """
         pass
 
-    def get_books_all_types(self) -> DataFrame:
+    def parse_books_all_types(self) -> DataFrame:
         """
         Parse and returns new, popular and with discount books.
         :return: data frame of books with schema:
