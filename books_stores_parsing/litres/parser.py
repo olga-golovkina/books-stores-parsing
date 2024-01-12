@@ -117,6 +117,6 @@ class LitresBookParser(BookParser):
         )
 
         books_df = self.__extract_books(discount_page)
-        books_df["type_id"] = self.__book_selling_statuses["with_discount"]
+        books_df["type_id"] = self.__book_selling_statuses["discounted"]
 
         return books_df
