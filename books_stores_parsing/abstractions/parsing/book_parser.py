@@ -59,7 +59,6 @@ class BookParser(ABC):
         """
         pass
 
-    @abstractmethod
     def get_books_all_types(self) -> DataFrame:
         """
         Parse and returns new, popular and with discount books.
