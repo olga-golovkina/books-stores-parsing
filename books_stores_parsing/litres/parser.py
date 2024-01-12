@@ -19,7 +19,7 @@ class LitresBookParser(BookParser):
 
     @staticmethod
     def __get_soup_by_url(url: URL):
-        return BeautifulSoup(requests.get(str(url)).text)
+        return BeautifulSoup(requests.get(str(url)).text, "html.parser")
 
     def __get_books_grid(self, page_soup: BeautifulSoup):
         return page_soup.find(
