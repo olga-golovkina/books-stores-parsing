@@ -11,9 +11,11 @@ from ..abstractions.parsing.book_parser import BookParser
 
 
 class LitresBookParser(BookParser):
-    def __init__(self, book_selling_statuses: DictConfig):
+    def __init__(self, book_selling_statuses: DictConfig, store_id: int):
         self.__domain = URL("https://www.litres.ru/")
+
         self.__book_selling_statuses = book_selling_statuses
+        self.__store_id = store_id
 
     @staticmethod
     def __get_soup_by_url(url: URL):
@@ -78,7 +80,7 @@ class LitresBookParser(BookParser):
 
         return {
             "timestamp": datetime.now().timestamp(),
-            "store": "litres.ru",
+            "store_id": "litres.ru",
             "title": self.__get_title(book_page),
             "author": self.__get_author(book_page),
             "isbn": self.__get_isbn(book_page),
