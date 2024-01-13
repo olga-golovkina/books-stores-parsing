@@ -30,13 +30,14 @@ class BookParser(ABC):
         :return: data frame of books with schema:
         timestamp,
         store_id,
+        url,
         title,
         author,
         isbn,
         description,
         rating,
         price,
-        type_id.
+        category_id.
         If no books are found it will return an empty data frame.
         """
         pass
@@ -48,13 +49,14 @@ class BookParser(ABC):
         :return: data frame of books with schema:
         timestamp,
         store_id,
+        url,
         title,
         author,
         isbn,
         description,
         rating,
         price,
-        type_id.
+        category_id.
         If no books are found it will return an empty data frame.
         """
         pass
@@ -65,13 +67,14 @@ class BookParser(ABC):
         :return: data frame of books with schema:
         timestamp,
         store_id,
+        url,
         title,
         author,
         isbn,
         description,
         rating,
         price,
-        type_id.
+        category_id.
         If no books are found it will return an empty data frame.
         """
         return pd.concat(

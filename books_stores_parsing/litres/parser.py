@@ -102,7 +102,7 @@ class LitresBookParser(BookParser):
         new_page = self.__get_soup_by_url(self.__domain.with_path("new"))
 
         books_df = self.__extract_books(new_page)
-        books_df["type_id"] = self.__book_selling_statuses["new"]
+        books_df["category_id"] = self.__book_selling_statuses["new"]
 
         return books_df
 
@@ -110,7 +110,7 @@ class LitresBookParser(BookParser):
         popular_page = self.__get_soup_by_url(self.__domain.with_path("popular"))
 
         books_df = self.__extract_books(popular_page)
-        books_df["type_id"] = self.__book_selling_statuses["popular"]
+        books_df["category_id"] = self.__book_selling_statuses["popular"]
 
         return books_df
 
@@ -120,6 +120,6 @@ class LitresBookParser(BookParser):
         )
 
         books_df = self.__extract_books(discount_page)
-        books_df["type_id"] = self.__book_selling_statuses["discounted"]
+        books_df["category_id"] = self.__book_selling_statuses["discounted"]
 
         return books_df
