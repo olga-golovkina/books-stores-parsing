@@ -10,9 +10,9 @@ from yarl import URL
 from ..abstractions.parsing.book_parser import BookParser
 
 
-class LitresBookParser(BookParser):
+class LivelibBookParser(BookParser):
     def __init__(self, book_selling_statuses: DictConfig, store_id: int):
-        self.__domain = URL("https://www.litres.ru/")
+        self.__domain = URL("https://www.livelib.ru/")
 
         self.__book_selling_statuses = book_selling_statuses
         self.__store_id = store_id
@@ -22,56 +22,56 @@ class LitresBookParser(BookParser):
         return BeautifulSoup(requests.get(str(url)).text, "lxml")
 
     def __get_books_grid(self, page_soup: BeautifulSoup):
-        return page_soup.find(
-            "div", {"class": "ArtsGrid-module__artsGrid__wrapper_2s8A9"}
-        )
+        return page_soup.find("ul", {"id": "books-more"})
 
     def __get_all_books_from_grid(self, grid_soup: BeautifulSoup):
-        return grid_soup.findAll("div", {"class": "ArtsGrid-module__artWrapper_1j1xJ"})
+        return grid_soup.findAll("li", {"class": "book-item__item "})
 
     def __get_title(self, book_page: BeautifulSoup) -> str:
-        return book_page.find("h1", {"itemprop": "name"}).text.strip()
+        return book_page.find("h1", {"class": "bc__book-title "}).text.strip()
 
     def __get_author(self, book_page: BeautifulSoup) -> str:
         return (
-            book_page.find("div", {"class": "Authors-module__authors__wrapper_1rZey"})
-            .find("span", {"itemprop": "name"})
+            book_page.find("h2", {"class": "bc-author"})
+            .find("a", {"class": "bc-author__link"})
             .text.strip()
         )
 
     def __get_isbn(self, book_page: BeautifulSoup) -> str:
-        raw_isbn = book_page.find("span", {"itemprop": "isbn"})
+        raw_isbn = (
+            book_page.find("div", {"class": "bc-info"})
+            .find("p", {"text": "ISBN: "})
+            .find("span")
+        )
 
         return raw_isbn.text.strip() if raw_isbn is not None else None
 
-    def __extract_description_text(self, raw_desc: BeautifulSoup) -> str:
-        return raw_desc.text.strip()
-
     def __get_description(self, book_page: BeautifulSoup) -> str:
-        return "\n".join(
-            map(
-                self.__extract_description_text,
-                book_page.find("div", {"itemprop": "description"}).findAll("p"),
-            )
-        )
+        return book_page.find(
+            "div", {"id": "lenta-card__text-edition-full"}
+        ).text.replace("<br>", "\n")
 
     def __get_rating(self, book_page: BeautifulSoup) -> float:
-        return float(book_page.find("meta", {"itemprop": "ratingValue"})["content"])
-
-    def __get_price(self, book_page: BeautifulSoup) -> float:
-        price_block = book_page.find(
-            "strong", {"class": "SaleBlock-module__block__price__default_kE68R"}
+        return float(
+            book_page.find("div", {"class": "bc-rating"})
+            .find("span")
+            .text.strip()
+            .replace(",", ".")
         )
 
-        return (
-            re.findall(r"\d+", price_block.text)[0] if price_block is not None else 0.0
+    def __get_price(self, book_page: BeautifulSoup) -> float:
+        price_panel = book_page.find("div", {"class": "lightlabel-book24-card"})
+
+        if price_panel is None:
+            return 0.0
+
+        return float(
+            re.findall(r"\d+", price_panel.find("p", {"class": "price"}).text)[0]
         )
 
     def __get_url(self, book_soup: BeautifulSoup) -> URL:
         return self.__domain.with_path(
-            book_soup.find("a", {"data-test-id": "art__title--desktop"}, href=True)[
-                "href"
-            ]
+            book_soup.find("a", {"class": "book-item__title"}, href=True)["href"]
         )
 
     def __extract_book_data(self, raw_book_data) -> dict:
@@ -81,7 +81,6 @@ class LitresBookParser(BookParser):
         return {
             "timestamp": datetime.now().timestamp(),
             "store_id": self.__store_id,
-            "url": str(book_url),
             "title": self.__get_title(book_page),
             "author": self.__get_author(book_page),
             "isbn": self.__get_isbn(book_page),
@@ -99,7 +98,7 @@ class LitresBookParser(BookParser):
         return DataFrame(books)
 
     def parse_new_books(self) -> DataFrame:
-        new_page = self.__get_soup_by_url(self.__domain.with_path("new"))
+        new_page = self.__get_soup_by_url(self.__domain.with_path("books/novelties"))
 
         books_df = self.__extract_books(new_page)
         books_df["type_id"] = self.__book_selling_statuses["new"]
@@ -115,11 +114,15 @@ class LitresBookParser(BookParser):
         return books_df
 
     def parse_books_with_discount(self) -> DataFrame:
-        discount_page = self.__get_soup_by_url(
-            self.__domain.with_path("collections/samye-bolshie-skidki-segodnya")
+        return DataFrame(
+            columns=[
+                "timestamp",
+                "store_id",
+                "title",
+                "author",
+                "isbn",
+                "description",
+                "rating",
+                "price",
+            ]
         )
-
-        books_df = self.__extract_books(discount_page)
-        books_df["type_id"] = self.__book_selling_statuses["discounted"]
-
-        return books_df
