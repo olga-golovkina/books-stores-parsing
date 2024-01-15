@@ -1,3 +1,9 @@
-new: 1
-popular: 2
-discounted: 3
+new:
+  id: 1
+  name: Новинки
+popular:
+  id: 2
+  name: Бестселлеры
+discounted:
+  id: 3
+  name: Книги со скидкой

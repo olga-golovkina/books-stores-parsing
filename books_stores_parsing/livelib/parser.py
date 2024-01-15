@@ -11,10 +11,10 @@ from ..abstractions.parsing.book_parser import BookParser
 
 
 class LivelibBookParser(BookParser):
-    def __init__(self, book_selling_statuses: DictConfig, store_id: int):
+    def __init__(self, categories: DictConfig, store_id: int):
         self.__domain = URL("https://www.livelib.ru/")
 
-        self.__book_selling_statuses = book_selling_statuses
+        self.__categories = categories
         self.__store_id = store_id
 
     @staticmethod
@@ -74,6 +74,9 @@ class LivelibBookParser(BookParser):
             book_soup.find("a", {"class": "book-item__title"}, href=True)["href"]
         )
 
+    def __get_img_url(self, book_page: BeautifulSoup) -> str:
+        return book_page.find("img", {"id": "main-image-book"})["src"]
+
     def __extract_book_data(self, raw_book_data) -> dict:
         book_url = self.__get_url(raw_book_data)
         book_page = self.__get_soup_by_url(book_url)
@@ -82,6 +85,7 @@ class LivelibBookParser(BookParser):
             "timestamp": datetime.now().timestamp(),
             "store_id": self.__store_id,
             "title": self.__get_title(book_page),
+            "img_url": self.__get_img_url(book_page),
             "author": self.__get_author(book_page),
             "isbn": self.__get_isbn(book_page),
             "description": self.__get_description(book_page),
@@ -101,7 +105,7 @@ class LivelibBookParser(BookParser):
         new_page = self.__get_soup_by_url(self.__domain.with_path("books/novelties"))
 
         books_df = self.__extract_books(new_page)
-        books_df["category_id"] = self.__book_selling_statuses["new"]
+        books_df["category_id"] = self.__categories["new"]["id"]
 
         return books_df
 
@@ -109,7 +113,7 @@ class LivelibBookParser(BookParser):
         popular_page = self.__get_soup_by_url(self.__domain.with_path("popular"))
 
         books_df = self.__extract_books(popular_page)
-        books_df["category_id"] = self.__book_selling_statuses["popular"]
+        books_df["category_id"] = self.__categories["popular"]["id"]
 
         return books_df
 

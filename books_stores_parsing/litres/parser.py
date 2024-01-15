@@ -11,10 +11,10 @@ from ..abstractions.parsing.book_parser import BookParser
 
 
 class LitresBookParser(BookParser):
-    def __init__(self, book_selling_statuses: DictConfig, store_id: int):
+    def __init__(self, categories: DictConfig, store_id: int):
         self.__domain = URL("https://www.litres.ru/")
 
-        self.__book_selling_statuses = book_selling_statuses
+        self.__categories = categories
         self.__store_id = store_id
 
     @staticmethod
@@ -74,6 +74,11 @@ class LitresBookParser(BookParser):
             ]
         )
 
+    def __get_img_url(self, book_page: BeautifulSoup) -> str:
+        return book_page.find("div", {"class": "newCover__container_1OWnO"}).find(
+            "img", {"itemprop": "image"}
+        )["src"]
+
     def __extract_book_data(self, raw_book_data) -> dict:
         book_url = self.__get_url(raw_book_data)
         book_page = self.__get_soup_by_url(book_url)
@@ -83,6 +88,7 @@ class LitresBookParser(BookParser):
             "store_id": self.__store_id,
             "url": str(book_url),
             "title": self.__get_title(book_page),
+            "img_url": self.__get_img_url(book_page),
             "author": self.__get_author(book_page),
             "isbn": self.__get_isbn(book_page),
             "description": self.__get_description(book_page),
@@ -102,7 +108,7 @@ class LitresBookParser(BookParser):
         new_page = self.__get_soup_by_url(self.__domain.with_path("new"))
 
         books_df = self.__extract_books(new_page)
-        books_df["category_id"] = self.__book_selling_statuses["new"]
+        books_df["category_id"] = self.__categories["new"]["id"]
 
         return books_df
 
@@ -110,7 +116,7 @@ class LitresBookParser(BookParser):
         popular_page = self.__get_soup_by_url(self.__domain.with_path("popular"))
 
         books_df = self.__extract_books(popular_page)
-        books_df["category_id"] = self.__book_selling_statuses["popular"]
+        books_df["category_id"] = self.__categories["popular"]["id"]
 
         return books_df
 
@@ -120,6 +126,6 @@ class LitresBookParser(BookParser):
         )
 
         books_df = self.__extract_books(discount_page)
-        books_df["category_id"] = self.__book_selling_statuses["discounted"]
+        books_df["category_id"] = self.__categories["discounted"]["id"]
 
         return books_df
