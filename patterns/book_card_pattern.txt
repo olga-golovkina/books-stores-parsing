@@ -1,0 +1,20 @@
+<h3>{title}</h3>
+
+<p>
+<b>Автор:</b> {author}
+<br>
+<b>ISBN:</b> {isbn}
+<br>
+<b>Рейтинг:</b> {rating}
+<br>
+<b>Стоимость:</b> {price} руб.
+<br>
+<b>Ссылка на книгу в магазине:</b> <a href="{url}">{url}</a>
+</p>
+
+<img src="{img_url}">
+
+<h4>Описание</h4>
+<p align="justify">
+{description}
+</p>

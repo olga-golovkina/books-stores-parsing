@@ -11,10 +11,10 @@ from ..abstractions.parsing.book_parser import BookParser
 
 
 class Book24BookParser(BookParser):
-    def __init__(self, book_selling_statuses: DictConfig, store_id: int):
+    def __init__(self, categories: DictConfig, store_id: int):
         self.__domain = URL("https://book24.ru/")
 
-        self.__book_selling_statuses = book_selling_statuses
+        self.__categories = categories
         self.__store_id = store_id
 
     @staticmethod
@@ -30,9 +30,11 @@ class Book24BookParser(BookParser):
         return grid_soup.findAll("div", {"class": "product-list__item"})
 
     def __get_title(self, book_page: BeautifulSoup) -> str:
-        return book_page.find(
-            "h1", {"class": "product-detail-page__title"}
-        ).text.strip()
+        return (
+            book_page.find("h1", {"class": "product-detail-page__title"})
+            .text.split(":")[-1]
+            .strip()
+        )
 
     def __is_author_field(self, book_properties: BeautifulSoup) -> bool:
         return (
@@ -60,13 +62,17 @@ class Book24BookParser(BookParser):
     def __get_isbn(self, book_properties: List[BeautifulSoup]) -> str:
         isbn_field = next(filter(self.__is_isbn_field, book_properties))
 
-        return isbn_field.text if isbn_field is not None else None
+        return (
+            isbn_field.text.replace("ISBN:", "").strip()
+            if isbn_field is not None
+            else None
+        )
 
     def __extract_description_text(self, raw_desc: BeautifulSoup) -> str:
         return raw_desc.text.strip()
 
     def __get_description(self, book_page: BeautifulSoup) -> str:
-        return "\n".join(
+        return "<br>".join(
             map(
                 self.__extract_description_text,
                 book_page.find("div", {"class": "product-about__text"}).findAll("p"),
@@ -99,6 +105,11 @@ class Book24BookParser(BookParser):
             },
         ).findAll("div", {"class": "product-characteristic__item"})
 
+    def __get_img_url(self, book_page: BeautifulSoup) -> str:
+        return book_page.find(
+            "picture", {"class": "product-poster__main-picture"}
+        ).find("img", {"class": "product-poster__main-image"})["src"]
+
     def __extract_book_data(self, raw_book_data) -> dict:
         book_url = self.__get_url(raw_book_data)
         book_page = self.__get_soup_by_url(book_url)
@@ -110,6 +121,7 @@ class Book24BookParser(BookParser):
             "store_id": self.__store_id,
             "url": str(book_url),
             "title": self.__get_title(book_page),
+            "img_url": self.__get_img_url(book_page),
             "author": self.__get_author(book_props),
             "isbn": self.__get_isbn(book_props),
             "description": self.__get_description(book_page),
@@ -129,7 +141,7 @@ class Book24BookParser(BookParser):
         new_page = self.__get_soup_by_url(self.__domain.with_path("novie-knigi"))
 
         books_df = self.__extract_books(new_page)
-        books_df["category_id"] = self.__book_selling_statuses["new"]
+        books_df["category_id"] = self.__categories["new"]["id"]
 
         return books_df
 
@@ -139,7 +151,7 @@ class Book24BookParser(BookParser):
         )
 
         books_df = self.__extract_books(popular_page)
-        books_df["category_id"] = self.__book_selling_statuses["popular"]
+        books_df["category_id"] = self.__categories["popular"]["id"]
 
         return books_df
 
@@ -147,6 +159,6 @@ class Book24BookParser(BookParser):
         discount_page = self.__get_soup_by_url(self.__domain.with_path("best-price"))
 
         books_df = self.__extract_books(discount_page)
-        books_df["category_id"] = self.__book_selling_statuses["discounted"]
+        books_df["category_id"] = self.__categories["discounted"]["id"]
 
         return books_df
