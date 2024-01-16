@@ -4,15 +4,15 @@ import re
 from pathlib import Path
 
 from hydra import compose, initialize
-from pyspark import SparkContext
+from pyspark import RDD, SparkContext
 from pyspark.sql import SparkSession
 from pyspark.streaming import StreamingContext
 
 from parsing import parse
 
 
-def handle_stream(record, session: SparkSession, saving_path: Path):
-    if not record.is_empty():
+def handle_stream(record: RDD, session: SparkSession, saving_path: Path):
+    if not record.count() == 0:
         books = session.createDataFrame(record)
         books = books.selectExpr(
             "_1 as timestamp",
@@ -44,7 +44,7 @@ def run_spark():
         lambda file: re.split(r"\s+", file)
     )
     input_stream.foreachRDD(
-        lambda rec: handle_stream(rec, spark_session, Path(path_cfg["spark_books"]))
+        lambda rdd: handle_stream(rdd, spark_session, Path(path_cfg["spark_books"]))
     )
     stream_ctx.start()
     stream_ctx.awaitTermination()
