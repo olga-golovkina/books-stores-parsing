@@ -87,3 +87,25 @@ class BookParser(ABC):
                 self.parse_books_with_discount(),
             ]
         ).reset_index(drop=True)
+
+    @staticmethod
+    def _create_empty_books() -> DataFrame:
+        """
+        Create empty books data frame
+        :return: empty data frame
+        """
+        return DataFrame(
+            columns=[
+                "timestamp",
+                "store_id",
+                "url",
+                "title",
+                "img_url",
+                "author",
+                "isbn",
+                "description",
+                "rating",
+                "price",
+                "category_id",
+            ]
+        )

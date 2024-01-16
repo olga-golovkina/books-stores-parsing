@@ -111,6 +111,10 @@ class LivelibBookParser(BookParser):
 
     def __extract_books(self, main_page: BeautifulSoup) -> DataFrame:
         books_grid = self.__get_books_grid(main_page)
+
+        if books_grid is None:
+            return BookParser._create_empty_books()
+
         books_raw = self.__get_all_books_from_grid(books_grid)
 
         books = [self.__extract_book_data(book) for book in books_raw]
@@ -136,18 +140,4 @@ class LivelibBookParser(BookParser):
         return books_df
 
     def parse_books_with_discount(self) -> DataFrame:
-        return DataFrame(
-            columns=[
-                "timestamp",
-                "store_id",
-                "url",
-                "title",
-                "img_url",
-                "author",
-                "isbn",
-                "description",
-                "rating",
-                "price",
-                "category_id",
-            ]
-        )
+        return BookParser._create_empty_books()
