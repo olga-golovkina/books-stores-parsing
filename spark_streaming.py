@@ -38,7 +38,7 @@ def run_spark():
     spark_session = SparkSession(spark_ctx)
     stream_ctx = StreamingContext(spark_ctx, 1)
 
-    path_cfg = Path(compose(config_name="path_config"))
+    path_cfg = compose(config_name="path_config")
 
     input_stream = stream_ctx.textFileStream(path_cfg["hadoop_books"]).map(
         lambda file: re.split(r"\s+", file)
