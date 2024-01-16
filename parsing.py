@@ -41,7 +41,7 @@ def main():
     PATH = Path(
         "/opt/hadoop/airflow/dags/o_golovkina/book_stores_parser/data/books.txt"
     )
-    HADOOP_PATH = Path("/home/o_golovkina/project/parsed_data/books.txt")
+    HADOOP_PATH = Path("/user/o_golovkina/book_stores_parsing/books.txt")
 
     with open(os.open(PATH.absolute(), os.O_RDWR, mode=777), "w") as file:
         text_data = res.to_string(header=False, index=False, decimal=";")
