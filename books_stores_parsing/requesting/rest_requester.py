@@ -21,7 +21,7 @@ class RestRequester(Requester):
         self.__session.cookies.clear()
 
     def request(self, url: URL) -> BeautifulSoup:
-        time.sleep(2)
+        time.sleep(3)
 
         response = self.__session.get(str(url), headers=self.__header)
         self.__session.cookies.clear()
