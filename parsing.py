@@ -3,15 +3,16 @@ from pathlib import Path
 from subprocess import PIPE, Popen
 
 import pandas as pd
-
-# from hydra import compose, initialize
+from hydra import compose, initialize
 
 
 def main():
-    # initialize(
-    #     version_base=None, config_path="configs", job_name="books_stores_parsing"
-    # )
-    #
+    initialize(
+        version_base=None, config_path="configs", job_name="books_stores_parsing"
+    )
+
+    path_cfg = compose(config_name="path_config")
+
     # category_ids = compose(config_name="book_categories")
     # store_ids = compose(config_name="store_ids")
 
@@ -38,17 +39,17 @@ def main():
 
     res = pd.read_csv("./output/books.txt", sep=";")
 
-    PATH = Path(
-        "/opt/hadoop/airflow/dags/o_golovkina/book_stores_parser/data/books.txt"
-    )
-    HADOOP_PATH = Path("/user/o_golovkina/book_stores_parsing/books.txt")
+    PATH = Path(path_cfg["parsed_books"])
+    HADOOP_PATH = Path(path_cfg["hadoop_books"])
 
     with open(os.open(PATH.absolute(), os.O_RDWR, mode=777), "w") as file:
         text_data = res.to_string(header=False, index=False, decimal=";")
         file.write(text_data)
 
     create_dir = Popen(
-        ["hdfs", "dfs", "-mkdir", "-p", HADOOP_PATH.parents[0].absolute()]
+        ["hdfs", "dfs", "-mkdir", "-p", HADOOP_PATH.parents[0].absolute()],
+        stdin=PIPE,
+        bufsize=-1,
     )
     create_dir.communicate()
 
