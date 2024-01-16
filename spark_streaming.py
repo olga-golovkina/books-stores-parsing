@@ -43,7 +43,9 @@ def run_spark():
     input_stream = stream_ctx.textFileStream(path_cfg["hadoop_books"]).map(
         lambda file: re.split(r"\s+", file)
     )
-    input_stream.foreachRDD(lambda rec: handle_stream(rec, spark_session, path_cfg))
+    input_stream.foreachRDD(
+        lambda rec: handle_stream(rec, spark_session, Path(path_cfg["spark_books"]))
+    )
     stream_ctx.start()
     stream_ctx.awaitTermination()
 
