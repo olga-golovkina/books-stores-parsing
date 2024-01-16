@@ -115,7 +115,8 @@ class LitresBookParser(BookParser):
         return books_df
 
     def parse_popular_books(self) -> DataFrame:
-        popular_page = self.__requester.request(self.__domain.with_path("popular"))
+        url = self.__domain.with_path("popular/").with_query({"art_types": "text_book"})
+        popular_page = self.__requester.request(url)
 
         books_df = self.__extract_books(popular_page)
         books_df["category_id"] = self.__categories["popular"]["id"]
@@ -123,9 +124,12 @@ class LitresBookParser(BookParser):
         return books_df
 
     def parse_books_with_discount(self) -> DataFrame:
-        discount_page = self.__requester.request(
-            self.__domain.with_path("collections/samye-bolshie-skidki-segodnya")
-        )
+
+        url = self.__domain.with_path(
+            "collections/samye-bolshie-skidki-segodnya/"
+        ).with_query({"art_types": "text_book"})
+
+        discount_page = self.__requester.request(url)
 
         books_df = self.__extract_books(discount_page)
         books_df["category_id"] = self.__categories["discounted"]["id"]
