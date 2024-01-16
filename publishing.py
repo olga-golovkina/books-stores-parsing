@@ -9,7 +9,7 @@ from books_stores_parsing.telegraph.article_creator import TelegraphHtmlArticleC
 from books_stores_parsing.telegraph.article_publisher import TelegraphArticlePublisher
 
 
-def main():
+def publish():
     initialize(
         version_base=None, config_path="configs", job_name="books_stores_parsing"
     )
@@ -35,5 +35,5 @@ def main():
     tg_publisher.publish(books)
 
 
-if __name__ == "__main__":
-    main()
+# if __name__ == "__main__":
+#     publish()

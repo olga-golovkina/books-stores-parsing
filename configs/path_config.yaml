@@ -1,2 +1,3 @@
 parsed_books: /opt/hadoop/airflow/dags/o_golovkina/book_stores_parser/data/books.txt
-hadoop_books: /user/o_golovkina/book_stores_parsing/books.txt
+hadoop_books: /user/o_golovkina/book_stores_parsing/data/books.txt
+spark_books: /user/o_golovkina/book_stores_parsing/result/
