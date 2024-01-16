@@ -4,6 +4,7 @@ from subprocess import PIPE, Popen
 
 import pandas as pd
 from hydra import compose, initialize
+from hydra.core.global_hydra import GlobalHydra
 
 
 def create_hadoop_directory(path: Path):
@@ -19,9 +20,11 @@ def create_hadoop_directory(path: Path):
 
 
 def parse():
-    initialize(
-        version_base=None, config_path="configs", job_name="books_stores_parsing"
-    )
+
+    if not GlobalHydra.instance().is_initialized():
+        initialize(
+            version_base=None, config_path="configs", job_name="books_stores_parsing"
+        )
 
     path_cfg = compose(config_name="path_config")
 
