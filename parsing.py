@@ -47,6 +47,11 @@ def main():
         text_data = res.to_string(header=False, index=False, decimal=";")
         file.write(text_data)
 
+    create_dir = Popen(
+        ["hdfs", "dfs", "-mkdir", "-p", HADOOP_PATH.parents[0].absolute()]
+    )
+    create_dir.communicate()
+
     put = Popen(
         ["hdfs", "dfs", "-put", "-f", PATH, HADOOP_PATH], stdin=PIPE, bufsize=-1
     )
