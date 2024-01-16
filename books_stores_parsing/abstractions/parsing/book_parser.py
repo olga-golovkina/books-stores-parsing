@@ -9,7 +9,7 @@ class BookParser(ABC):
     def parse_new_books(self) -> DataFrame:
         """
         Parse and returns new books from source.
-        :return: data frame of books with schema:
+        :return: output frame of books with schema:
         timestamp,
         store_id,
         title,
@@ -19,7 +19,7 @@ class BookParser(ABC):
         rating,
         price,
         type_id.
-        If no books are found it will return an empty data frame.
+        If no books are found it will return an empty output frame.
         """
         pass
 
@@ -27,7 +27,7 @@ class BookParser(ABC):
     def parse_popular_books(self) -> DataFrame:
         """
         Parse and returns popular books from source.
-        :return: data frame of books with schema:
+        :return: output frame of books with schema:
         timestamp,
         store_id,
         url,
@@ -39,7 +39,7 @@ class BookParser(ABC):
         rating,
         price,
         category_id.
-        If no books are found it will return an empty data frame.
+        If no books are found it will return an empty output frame.
         """
         pass
 
@@ -47,7 +47,7 @@ class BookParser(ABC):
     def parse_books_with_discount(self) -> DataFrame:
         """
         Parse and returns books with discount.
-        :return: data frame of books with schema:
+        :return: output frame of books with schema:
         timestamp,
         store_id,
         url,
@@ -59,14 +59,14 @@ class BookParser(ABC):
         rating,
         price,
         category_id.
-        If no books are found it will return an empty data frame.
+        If no books are found it will return an empty output frame.
         """
         pass
 
     def parse_books_all_types(self) -> DataFrame:
         """
         Parse and returns new, popular and with discount books.
-        :return: data frame of books with schema:
+        :return: output frame of books with schema:
         timestamp,
         store_id,
         url,
@@ -78,7 +78,7 @@ class BookParser(ABC):
         rating,
         price,
         category_id.
-        If no books are found it will return an empty data frame.
+        If no books are found it will return an empty output frame.
         """
         return pd.concat(
             [

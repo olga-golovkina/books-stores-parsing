@@ -1,25 +1,23 @@
 import re
 from datetime import datetime
 
-import requests
 from bs4 import BeautifulSoup
 from omegaconf import DictConfig
 from pandas import DataFrame
 from yarl import URL
 
 from ..abstractions.parsing.book_parser import BookParser
+from ..abstractions.parsing.requester import Requester
 
 
 class LitresBookParser(BookParser):
-    def __init__(self, categories: DictConfig, store_id: int):
+    def __init__(self, requester: Requester, categories: DictConfig, store_id: int):
+        self.__requester = requester
+
         self.__domain = URL("https://www.litres.ru/")
 
         self.__categories = categories
         self.__store_id = store_id
-
-    @staticmethod
-    def __get_soup_by_url(url: URL):
-        return BeautifulSoup(requests.get(str(url)).text, "lxml")
 
     def __get_books_grid(self, page_soup: BeautifulSoup):
         return page_soup.find(
@@ -75,13 +73,16 @@ class LitresBookParser(BookParser):
         )
 
     def __get_img_url(self, book_page: BeautifulSoup) -> str:
-        return book_page.find("div", {"class": "newCover__container_1OWnO"}).find(
-            "img", {"itemprop": "image"}
-        )["src"]
+        return (
+            "https://cv2.litres.ru"
+            + book_page.find("div", {"class": "newCover__container_1OWnO"}).find("img")[
+                "src"
+            ]
+        )
 
     def __extract_book_data(self, raw_book_data) -> dict:
         book_url = self.__get_url(raw_book_data)
-        book_page = self.__get_soup_by_url(book_url)
+        book_page = self.__requester.request(book_url)
 
         return {
             "timestamp": datetime.now().timestamp(),
@@ -105,7 +106,8 @@ class LitresBookParser(BookParser):
         return DataFrame(books)
 
     def parse_new_books(self) -> DataFrame:
-        new_page = self.__get_soup_by_url(self.__domain.with_path("new"))
+        url = self.__domain.with_path("new/").with_query({"art_types": "text_book"})
+        new_page = self.__requester.request(url)
 
         books_df = self.__extract_books(new_page)
         books_df["category_id"] = self.__categories["new"]["id"]
@@ -113,7 +115,7 @@ class LitresBookParser(BookParser):
         return books_df
 
     def parse_popular_books(self) -> DataFrame:
-        popular_page = self.__get_soup_by_url(self.__domain.with_path("popular"))
+        popular_page = self.__requester.request(self.__domain.with_path("popular"))
 
         books_df = self.__extract_books(popular_page)
         books_df["category_id"] = self.__categories["popular"]["id"]
@@ -121,7 +123,7 @@ class LitresBookParser(BookParser):
         return books_df
 
     def parse_books_with_discount(self) -> DataFrame:
-        discount_page = self.__get_soup_by_url(
+        discount_page = self.__requester.request(
             self.__domain.with_path("collections/samye-bolshie-skidki-segodnya")
         )
 

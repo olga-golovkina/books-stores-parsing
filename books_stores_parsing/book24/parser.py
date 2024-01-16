@@ -1,25 +1,23 @@
 from datetime import datetime
 from typing import List
 
-import requests
 from bs4 import BeautifulSoup
 from omegaconf import DictConfig
 from pandas import DataFrame
 from yarl import URL
 
 from ..abstractions.parsing.book_parser import BookParser
+from ..abstractions.parsing.requester import Requester
 
 
 class Book24BookParser(BookParser):
-    def __init__(self, categories: DictConfig, store_id: int):
+    def __init__(self, requester: Requester, categories: DictConfig, store_id: int):
+        self.__requester = requester
+
         self.__domain = URL("https://book24.ru/")
 
         self.__categories = categories
         self.__store_id = store_id
-
-    @staticmethod
-    def __get_soup_by_url(url: URL):
-        return BeautifulSoup(requests.get(str(url)).text, "lxml")
 
     def __get_books_grid(self, page_soup: BeautifulSoup):
         return page_soup.find("div", {"class": "catalog-page__body"}).find(
@@ -72,10 +70,16 @@ class Book24BookParser(BookParser):
         return raw_desc.text.strip()
 
     def __get_description(self, book_page: BeautifulSoup) -> str:
+
+        desc_block = book_page.find("div", {"class": "product-about__text"})
+
+        if desc_block is None:
+            return "Нет описания"
+
         return "<br>".join(
             map(
                 self.__extract_description_text,
-                book_page.find("div", {"class": "product-about__text"}).findAll("p"),
+                desc_block.findAll("p"),
             )
         )
 
@@ -112,7 +116,7 @@ class Book24BookParser(BookParser):
 
     def __extract_book_data(self, raw_book_data) -> dict:
         book_url = self.__get_url(raw_book_data)
-        book_page = self.__get_soup_by_url(book_url)
+        book_page = self.__requester.request(book_url)
 
         book_props = self.__get_full_properties(book_page)
 
@@ -138,7 +142,7 @@ class Book24BookParser(BookParser):
         return DataFrame(books)
 
     def parse_new_books(self) -> DataFrame:
-        new_page = self.__get_soup_by_url(self.__domain.with_path("novie-knigi"))
+        new_page = self.__requester.request(self.__domain.with_path("novie-knigi"))
 
         books_df = self.__extract_books(new_page)
         books_df["category_id"] = self.__categories["new"]["id"]
@@ -146,7 +150,7 @@ class Book24BookParser(BookParser):
         return books_df
 
     def parse_popular_books(self) -> DataFrame:
-        popular_page = self.__get_soup_by_url(
+        popular_page = self.__requester.request(
             self.__domain.with_path("knigi-bestsellery")
         )
 
@@ -156,7 +160,7 @@ class Book24BookParser(BookParser):
         return books_df
 
     def parse_books_with_discount(self) -> DataFrame:
-        discount_page = self.__get_soup_by_url(self.__domain.with_path("best-price"))
+        discount_page = self.__requester.request(self.__domain.with_path("best-price"))
 
         books_df = self.__extract_books(discount_page)
         books_df["category_id"] = self.__categories["discounted"]["id"]

@@ -1,34 +1,32 @@
 import re
 from datetime import datetime
 
-import requests
 from bs4 import BeautifulSoup
 from omegaconf import DictConfig
 from pandas import DataFrame
 from yarl import URL
 
 from ..abstractions.parsing.book_parser import BookParser
+from ..abstractions.parsing.requester import Requester
 
 
 class LivelibBookParser(BookParser):
-    def __init__(self, categories: DictConfig, store_id: int):
+    def __init__(self, requester: Requester, categories: DictConfig, store_id: int):
+        self.__requester = requester
+
         self.__domain = URL("https://www.livelib.ru/")
 
         self.__categories = categories
         self.__store_id = store_id
 
-    @staticmethod
-    def __get_soup_by_url(url: URL):
-        return BeautifulSoup(requests.get(str(url)).text, "lxml")
-
     def __get_books_grid(self, page_soup: BeautifulSoup):
         return page_soup.find("ul", {"id": "books-more"})
 
     def __get_all_books_from_grid(self, grid_soup: BeautifulSoup):
-        return grid_soup.findAll("li", {"class": "book-item__item "})
+        return grid_soup.findAll("li", {"class": "book-item__item"})
 
     def __get_title(self, book_page: BeautifulSoup) -> str:
-        return book_page.find("h1", {"class": "bc__book-title "}).text.strip()
+        return book_page.find("h1", {"class": "bc__book-title"}).text.strip()
 
     def __get_author(self, book_page: BeautifulSoup) -> str:
         return (
@@ -37,19 +35,33 @@ class LivelibBookParser(BookParser):
             .text.strip()
         )
 
-    def __get_isbn(self, book_page: BeautifulSoup) -> str:
-        raw_isbn = (
-            book_page.find("div", {"class": "bc-info"})
-            .find("p", {"text": "ISBN: "})
-            .find("span")
-        )
+    def __is_isbn(self, content):
+        return "ISBN" in content
 
-        return raw_isbn.text.strip() if raw_isbn is not None else None
+    def __get_isbn(self, book_page: BeautifulSoup) -> str:
+
+        desc_block = book_page.find("div", {"class": "bc-info"})
+
+        if desc_block is None:
+            return ""
+
+        isbn = filter(self.__is_isbn, desc_block.findAll("p"))
+
+        if len(list(isbn)) == 0:
+            return ""
+
+        raw_isbn = next(isbn)
+
+        return raw_isbn.text.strip() if raw_isbn is not None else ""
 
     def __get_description(self, book_page: BeautifulSoup) -> str:
-        return book_page.find(
-            "div", {"id": "lenta-card__text-edition-full"}
-        ).text.replace("<br>", "\n")
+
+        desc_block = book_page.find("div", {"id": "lenta-card__text-edition-full"})
+
+        if desc_block is None:
+            return "Нет описания"
+
+        return desc_block.text.replace("<br>", "\n")
 
     def __get_rating(self, book_page: BeautifulSoup) -> float:
         return float(
@@ -71,7 +83,9 @@ class LivelibBookParser(BookParser):
 
     def __get_url(self, book_soup: BeautifulSoup) -> URL:
         return self.__domain.with_path(
-            book_soup.find("a", {"class": "book-item__title"}, href=True)["href"]
+            book_soup.find("a", {"class": "book-item__link"}, href=True)["href"].split(
+                "?"
+            )[0]
         )
 
     def __get_img_url(self, book_page: BeautifulSoup) -> str:
@@ -79,7 +93,9 @@ class LivelibBookParser(BookParser):
 
     def __extract_book_data(self, raw_book_data) -> dict:
         book_url = self.__get_url(raw_book_data)
-        book_page = self.__get_soup_by_url(book_url)
+        book_page = self.__requester.request(book_url)
+
+        _ = book_page
 
         return {
             "timestamp": datetime.now().timestamp(),
@@ -97,12 +113,12 @@ class LivelibBookParser(BookParser):
         books_grid = self.__get_books_grid(main_page)
         books_raw = self.__get_all_books_from_grid(books_grid)
 
-        books = map(self.__extract_book_data, books_raw)
+        books = [self.__extract_book_data(book) for book in books_raw]
 
         return DataFrame(books)
 
     def parse_new_books(self) -> DataFrame:
-        new_page = self.__get_soup_by_url(self.__domain.with_path("books/novelties"))
+        new_page = self.__requester.request(self.__domain.with_path("books/novelties"))
 
         books_df = self.__extract_books(new_page)
         books_df["category_id"] = self.__categories["new"]["id"]
@@ -110,7 +126,9 @@ class LivelibBookParser(BookParser):
         return books_df
 
     def parse_popular_books(self) -> DataFrame:
-        popular_page = self.__get_soup_by_url(self.__domain.with_path("popular"))
+        popular_page = self.__requester.request(
+            self.__domain.with_path("books/movers-and-shakers")
+        )
 
         books_df = self.__extract_books(popular_page)
         books_df["category_id"] = self.__categories["popular"]["id"]
@@ -122,7 +140,9 @@ class LivelibBookParser(BookParser):
             columns=[
                 "timestamp",
                 "store_id",
+                "url",
                 "title",
+                "img_url",
                 "author",
                 "isbn",
                 "description",

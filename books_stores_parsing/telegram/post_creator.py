@@ -52,14 +52,15 @@ class TelegramPostCreator(PostCreator):
                 continue
 
             article_title = f"{category_name} на {store} от {date_now.date()}"
-            article_content = self.__article_creator.create_article(books_by_category)
+            article_content = self.__article_creator.create_article(
+                books_by_category.head(10)
+            )
             article_url = self.__article_publisher.publish(
                 article_title, article_content
             )
 
             content += f"""
-[{category_name}]({article_url})
-"""
+[{category_name}]({article_url})"""
 
         return content.strip()
 
