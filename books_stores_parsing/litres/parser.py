@@ -46,7 +46,7 @@ class LitresBookParser(BookParser):
         return raw_desc.text.strip()
 
     def __get_description(self, book_page: BeautifulSoup) -> str:
-        return "\n".join(
+        return "<br>".join(
             map(
                 self.__extract_description_text,
                 book_page.find("div", {"itemprop": "description"}).findAll("p"),

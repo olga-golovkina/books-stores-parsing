@@ -10,7 +10,7 @@ class BookParser(ABC):
         """
         Parse and returns new books from source.
         :return: output frame of books with schema:
-        timestamp,
+        date,
         store_id,
         title,
         author,
@@ -28,7 +28,7 @@ class BookParser(ABC):
         """
         Parse and returns popular books from source.
         :return: output frame of books with schema:
-        timestamp,
+        date,
         store_id,
         url,
         title,
@@ -48,7 +48,7 @@ class BookParser(ABC):
         """
         Parse and returns books with discount.
         :return: output frame of books with schema:
-        timestamp,
+        date,
         store_id,
         url,
         title,
@@ -67,7 +67,7 @@ class BookParser(ABC):
         """
         Parse and returns new, popular and with discount books.
         :return: output frame of books with schema:
-        timestamp,
+        date,
         store_id,
         url,
         title,
@@ -96,7 +96,7 @@ class BookParser(ABC):
         """
         return DataFrame(
             columns=[
-                "timestamp",
+                "date",
                 "store_id",
                 "url",
                 "title",

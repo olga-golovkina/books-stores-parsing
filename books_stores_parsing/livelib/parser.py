@@ -61,7 +61,7 @@ class LivelibBookParser(BookParser):
         if desc_block is None:
             return "Нет описания"
 
-        return desc_block.text.replace("<br>", "\n")
+        return desc_block.text.strip()
 
     def __get_rating(self, book_page: BeautifulSoup) -> float:
         return float(

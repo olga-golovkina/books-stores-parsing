@@ -11,9 +11,12 @@ def run_spark():
 
     path_cfg = compose(config_name="path_config")
 
-    books = spark_session.read.option("header", "true").csv(
-        path_cfg["hadoop_books"], sep=";"
+    books = (
+        spark_session.read.option("header", "True")
+        .option("delimiter", ";")
+        .csv(path_cfg["hadoop_books"], sep=";")
     )
+
     books.show(2)
 
     # books.repartition("date", "store_id").write.mode("overwrite").partitionBy(
