@@ -33,6 +33,8 @@ class TelegramPostCreator(PostCreator):
         books_of_store = books[books["store_id"] == store_id]
         books_count = len(books_of_store.index)
 
+        print("Books of store count:", books_count)
+
         if books_count == 0:
             return None
 
@@ -47,6 +49,8 @@ class TelegramPostCreator(PostCreator):
                 books_of_store["category_id"] == category_id
             ]
             books_count = len(books_by_category.index)
+
+            print("Books of category count:", books_count)
 
             if books_count == 0:
                 continue
