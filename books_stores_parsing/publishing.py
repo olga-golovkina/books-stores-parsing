@@ -1,5 +1,4 @@
 # from pathlib import Path
-from cffi.model import StructType
 from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
 from pandas import DataFrame
@@ -9,7 +8,7 @@ from pyspark.sql import SparkSession
 # from books_stores_parsing.telegram.post_creator import TelegramPostCreator
 # from books_stores_parsing.telegraph.article_creator import TelegraphHtmlArticleCreator
 # from books_stores_parsing.telegraph.article_publisher import TelegraphArticlePublisher
-from pyspark.sql.types import DateType, FloatType, IntegerType, StringType
+from pyspark.sql.types import DateType, FloatType, IntegerType, StringType, StructType
 
 
 def create_schema():
