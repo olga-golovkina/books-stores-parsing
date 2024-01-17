@@ -64,9 +64,9 @@ def run_spark():
 
     print(books)
 
-    books.repartition(2).write().mode("overwrite").partitionBy(
-        "store_id", "category_id"
-    ).format("parquet").option("compression", "snappy").save(path_cfg["spark_books"])
+    books.repartition(2, "store_id", "category_id").write().mode("overwrite").format(
+        "parquet"
+    ).option("header", "true").save(path_cfg["spark_books"])
 
     print("Done")
 
