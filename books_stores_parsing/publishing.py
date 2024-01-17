@@ -12,20 +12,18 @@ from pyspark.sql import SparkSession
 
 
 def create_schema():
-    return StructType(
-        {
-            "datetime": "datetime",
-            "store_id": "integer",
-            "url": "string",
-            "title": "string",
-            "img_url": "string",
-            "author": "string",
-            "isbn": "string",
-            "description": "string",
-            "rating": "float",
-            "price": "integer",
-            "category_id": "integer",
-        }
+    return (
+        StructType()
+        .add("datetime", "datetime")
+        .add("store_id", "integer")
+        .add("url", "string")
+        .add("title", "string")
+        .add("img_url", "string")
+        .add("isbn", "string")
+        .add("description", "string")
+        .add("rating", "float")
+        .add("price", "integer")
+        .add("category_id", "integer")
     )
 
 
