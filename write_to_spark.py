@@ -28,7 +28,7 @@ def run_spark():
     )
 
     books = spark_session.read.csv(path_cfg["hadoop_books"], sep=";", schema=schema)
-    books.repartition(2, "date", "store_id").write.mode("overwrite").partitionBy(
+    books.repartition("date", "store_id").write.mode("overwrite").partitionBy(
         "date", "store_id"
     ).format("parquet").option("header", "true").save(path_cfg["spark_books"])
 
