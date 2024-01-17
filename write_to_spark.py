@@ -17,7 +17,7 @@ def run_spark():
         .csv(path_cfg["hadoop_books"], sep=";")
     )
 
-    books.show(2)
+    books.show(1)
 
     # books.repartition("date", "store_id").write.mode("overwrite").partitionBy(
     #     "date", "store_id"

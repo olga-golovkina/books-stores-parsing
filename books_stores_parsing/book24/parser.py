@@ -81,7 +81,7 @@ class Book24BookParser(BookParser):
                 self.__extract_description_text,
                 desc_block.findAll("p"),
             )
-        )
+        ).replace(";", ".")
 
     def __get_rating(self, book_page: BeautifulSoup) -> float:
         return float(

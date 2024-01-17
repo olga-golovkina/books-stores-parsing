@@ -51,7 +51,7 @@ class LitresBookParser(BookParser):
                 self.__extract_description_text,
                 book_page.find("div", {"itemprop": "description"}).findAll("p"),
             )
-        )
+        ).replace(";", ".")
 
     def __get_rating(self, book_page: BeautifulSoup) -> float:
         return float(book_page.find("meta", {"itemprop": "ratingValue"})["content"])

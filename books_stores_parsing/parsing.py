@@ -1,8 +1,7 @@
-import os
+# import os
 from pathlib import Path
 from subprocess import PIPE, Popen
 
-import pandas as pd
 from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
 
@@ -26,7 +25,6 @@ def create_hadoop_directory(path: Path):
 
 
 def parse():
-
     if not GlobalHydra.instance().is_initialized():
         initialize(
             version_base=None, config_path="../configs", job_name="books_stores_parsing"
@@ -61,20 +59,16 @@ def parse():
     #
     # res.to_csv("./output/books.txt", index=False, sep=";")
 
-    res = pd.read_csv("./output/books.txt", sep=";")
-
     books_path = Path(path_cfg["parsed_books"])
-    raw_books_hadoop_path = Path(path_cfg["hadoop_books"])
+    hadoop_books_path = Path(path_cfg["hadoop_books"])
 
-    with open(os.open(books_path.absolute(), os.O_RDWR, mode=777), "w") as file:
-        text_data = res.to_string(header=True, index=False, decimal=";")
-        file.write(text_data)
+    # res.to_csv(books_path, index=False, sep=";")
 
-    create_hadoop_directory(raw_books_hadoop_path)
+    create_hadoop_directory(hadoop_books_path.parents[0])
     create_hadoop_directory(Path(path_cfg["spark_books"]))
 
     put = Popen(
-        ["hdfs", "dfs", "-put", "-f", books_path, raw_books_hadoop_path],
+        ["hdfs", "dfs", "-put", "-f", books_path, hadoop_books_path],
         stdin=PIPE,
         bufsize=-1,
     )
