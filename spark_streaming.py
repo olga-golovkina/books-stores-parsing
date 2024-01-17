@@ -1,14 +1,17 @@
 # from multiprocessing import Process
 
-import re
+# import re
 from pathlib import Path
 
 from hydra import compose, initialize
-from pyspark import RDD, SparkContext
+
+# from pyspark import RDD, SparkContext
+from pyspark import RDD
 from pyspark.sql import SparkSession
-from pyspark.streaming import StreamingContext
 
 from parsing import parse
+
+# from pyspark.streaming import StreamingContext
 
 
 def handle_stream(record: RDD, session: SparkSession, saving_path: Path):
@@ -34,20 +37,29 @@ def handle_stream(record: RDD, session: SparkSession, saving_path: Path):
 
 
 def run_spark():
-    spark_ctx = SparkContext("yarn", "book_stores_parsing")
-    spark_session = SparkSession(spark_ctx)
-    stream_ctx = StreamingContext(spark_ctx, 1)
+    # spark_ctx = SparkContext("yarn", "book_stores_parsing")
+    spark_session = (
+        SparkSession.builder.master("yarn").appName("textFileStream").getOrCreate()
+    )
 
     path_cfg = compose(config_name="path_config")
 
-    input_stream = stream_ctx.textFileStream(path_cfg["hadoop_books"]).map(
-        lambda file: re.split(r"\s+", file)
-    )
-    input_stream.foreachRDD(
-        lambda rdd: handle_stream(rdd, spark_session, Path(path_cfg["spark_books"]))
-    )
-    stream_ctx.start()
-    stream_ctx.awaitTermination()
+    df = spark_session.read.csv(path_cfg["hadoop_books"])
+
+    print(df)
+
+    # stream_ctx = StreamingContext(spark_ctx, 1)
+    #
+    #
+    #
+    # input_stream = stream_ctx.textFileStream(path_cfg["hadoop_books"]).map(
+    #     lambda file: re.split(r"\s+", file)
+    # )
+    # input_stream.foreachRDD(
+    #     lambda rdd: handle_stream(rdd, spark_session, Path(path_cfg["spark_books"]))
+    # )
+    # stream_ctx.start()
+    # stream_ctx.awaitTermination()
 
 
 def main():
