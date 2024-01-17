@@ -67,7 +67,7 @@ def parse():
     raw_books_hadoop_path = Path(path_cfg["hadoop_books"])
 
     with open(os.open(books_path.absolute(), os.O_RDWR, mode=777), "w") as file:
-        text_data = res.to_string(header=False, index=False, decimal=";")
+        text_data = res.to_string(header=True, index=False, decimal=";")
         file.write(text_data)
 
     create_hadoop_directory(raw_books_hadoop_path)
