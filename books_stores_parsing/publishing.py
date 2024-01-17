@@ -27,7 +27,21 @@ def read_books() -> DataFrame:
         .csv(path_cfg["hadoop_books"], sep=";")
     )
 
-    return books.toPandas()
+    return books.toPandas().astype(
+        {
+            "date": "datetime",
+            "store_id": "int32",
+            "url": "string",
+            "title": "string",
+            "img_url": "string",
+            "author": "string",
+            "isbn": "string",
+            "description": "string",
+            "rating": "float",
+            "price": "int",
+            "category_id": "int",
+        }
+    )
 
 
 def publish():
