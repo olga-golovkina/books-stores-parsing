@@ -1,5 +1,5 @@
 # from pathlib import Path
-
+from cffi.model import StructType
 from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
 from pandas import DataFrame
@@ -9,6 +9,24 @@ from pyspark.sql import SparkSession
 # from books_stores_parsing.telegram.post_creator import TelegramPostCreator
 # from books_stores_parsing.telegraph.article_creator import TelegraphHtmlArticleCreator
 # from books_stores_parsing.telegraph.article_publisher import TelegraphArticlePublisher
+
+
+def create_schema():
+    return StructType(
+        {
+            "datetime": "datetime",
+            "store_id": "integer",
+            "url": "string",
+            "title": "string",
+            "img_url": "string",
+            "author": "string",
+            "isbn": "string",
+            "description": "string",
+            "rating": "float",
+            "price": "integer",
+            "category_id": "integer",
+        }
+    )
 
 
 def read_books() -> DataFrame:
@@ -24,7 +42,7 @@ def read_books() -> DataFrame:
     books = (
         spark_session.read.option("header", "True")
         .option("delimiter", ";")
-        .csv(path_cfg["hadoop_books"], sep=";")
+        .csv(path_cfg["hadoop_books"], sep=";", schema=create_schema())
     )
 
     books.show(2)
@@ -33,22 +51,7 @@ def read_books() -> DataFrame:
 
     print(books.head(2))
 
-    books = books.astype(
-        {
-            "store_id": "int",
-            "url": "string",
-            "title": "string",
-            "img_url": "string",
-            "author": "string",
-            "isbn": "string",
-            "description": "string",
-            "rating": "float",
-            "price": "int",
-            "category_id": "int",
-        }
-    )
-
-    books["datetime"] = books["datetime"].to_datetime()
+    print(books.info())
 
     return books
 
