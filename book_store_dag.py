@@ -4,8 +4,8 @@ from datetime import datetime, timedelta
 from airflow import DAG
 from airflow.operators.python import PythonOperator
 
-import parsing as parser
-import publishing as publisher
+from books_stores_parsing import parsing as parser
+from books_stores_parsing import publishing as publisher
 
 sys.path.append("/home/o_golovkina/book_stores_parsing/")
 

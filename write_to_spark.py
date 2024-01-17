@@ -2,7 +2,7 @@ from hydra import compose, initialize
 from pyspark.sql import SparkSession
 from pyspark.sql.types import StructType
 
-from parsing import parse
+from books_stores_parsing.parsing import parse
 
 
 def run_spark():

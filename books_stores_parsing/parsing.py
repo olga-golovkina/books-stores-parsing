@@ -23,7 +23,7 @@ def parse():
 
     if not GlobalHydra.instance().is_initialized():
         initialize(
-            version_base=None, config_path="configs", job_name="books_stores_parsing"
+            version_base=None, config_path="../configs", job_name="books_stores_parsing"
         )
 
     path_cfg = compose(config_name="path_config")
@@ -52,7 +52,7 @@ def parse():
     #     [thread.get_result() for thread in threads if thread.get_result() is not None]
     # ).reset_index(drop=True)
 
-    res = pd.read_csv("./output/books.txt", sep=";")
+    res = pd.read_csv("../output/books.txt", sep=";")
 
     books_path = Path(path_cfg["parsed_books"])
     raw_books_hadoop_path = Path(path_cfg["hadoop_books"])
