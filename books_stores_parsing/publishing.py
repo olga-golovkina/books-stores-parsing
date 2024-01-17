@@ -27,6 +27,8 @@ def read_books() -> DataFrame:
         .csv(path_cfg["hadoop_books"], sep=";")
     )
 
+    books.show(1)
+
     return books.toPandas().astype(
         {
             "date": "datetime",
