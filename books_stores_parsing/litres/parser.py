@@ -85,7 +85,7 @@ class LitresBookParser(BookParser):
         book_page = self.__requester.request(book_url)
 
         return {
-            "timestamp": datetime.now().timestamp(),
+            "date": datetime.now().date(),
             "store_id": self.__store_id,
             "url": str(book_url),
             "title": self.__get_title(book_page),

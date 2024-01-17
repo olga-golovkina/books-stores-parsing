@@ -98,7 +98,7 @@ class LivelibBookParser(BookParser):
         _ = book_page
 
         return {
-            "timestamp": datetime.now().timestamp(),
+            "date": datetime.now().date(),
             "store_id": self.__store_id,
             "title": self.__get_title(book_page),
             "img_url": self.__get_img_url(book_page),

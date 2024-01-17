@@ -121,7 +121,7 @@ class Book24BookParser(BookParser):
         book_props = self.__get_full_properties(book_page)
 
         return {
-            "timestamp": datetime.now().timestamp(),
+            "date": datetime.now().date(),
             "store_id": self.__store_id,
             "url": str(book_url),
             "title": self.__get_title(book_page),

@@ -1,3 +1,4 @@
+from datetime import datetime
 from pathlib import Path
 
 from hydra import compose, initialize
@@ -13,14 +14,14 @@ from pyspark.sql import SparkSession
 
 def read_books() -> DataFrame:
     spark_session = (
-        SparkSession.builder.master("yarn").appName("textFileStream").getOrCreate()
+        SparkSession.builder.master("yarn").appName("book_stores_parsing").getOrCreate()
     )
 
     path_cfg = compose("path_config")
     spark_path = Path(path_cfg["spark_books"])
 
-    books = spark_session.read.option("mergeSchema", "true").parquet(
-        spark_path.absolute()
+    books = spark_session.read.parquet(
+        spark_path.absolute().joinpath(f"date={datetime.now().date()}")
     )
 
     return books.toPandas()
