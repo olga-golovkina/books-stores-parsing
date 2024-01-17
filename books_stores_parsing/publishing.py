@@ -1,14 +1,14 @@
-from pathlib import Path
+# from pathlib import Path
 
 from hydra import compose, initialize
 from hydra.core.global_hydra import GlobalHydra
 from pandas import DataFrame
 from pyspark.sql import SparkSession
 
-from books_stores_parsing.telegram.bot_publisher import TelegramBotPublisher
-from books_stores_parsing.telegram.post_creator import TelegramPostCreator
-from books_stores_parsing.telegraph.article_creator import TelegraphHtmlArticleCreator
-from books_stores_parsing.telegraph.article_publisher import TelegraphArticlePublisher
+# from books_stores_parsing.telegram.bot_publisher import TelegramBotPublisher
+# from books_stores_parsing.telegram.post_creator import TelegramPostCreator
+# from books_stores_parsing.telegraph.article_creator import TelegraphHtmlArticleCreator
+# from books_stores_parsing.telegraph.article_publisher import TelegraphArticlePublisher
 
 
 def read_books() -> DataFrame:
@@ -27,9 +27,15 @@ def read_books() -> DataFrame:
         .csv(path_cfg["hadoop_books"], sep=";")
     )
 
-    books = books.toPandas().astype(
+    books.show(2)
+
+    books = books.toPandas()
+
+    print(books.head(2))
+
+    books = books.astype(
         {
-            "store_id": "int32",
+            "store_id": "int",
             "url": "string",
             "title": "string",
             "img_url": "string",
@@ -55,22 +61,24 @@ def publish():
             job_name="books_stores_parsing",
         )
 
-    categories = compose(config_name="book_categories")
-    tg_config = compose(config_name="tg_config")
-    store_ids = compose(config_name="store_ids")
+    # categories = compose(config_name="book_categories")
+    # tg_config = compose(config_name="tg_config")
+    # store_ids = compose(config_name="store_ids")
+    #
+    # chat_id = tg_config["chat_id"]
+    # api_token = tg_config["bot_api_token"]
+    #
+    # tg_post_creator = TelegramPostCreator(
+    #     TelegraphHtmlArticleCreator(Path("patterns")),
+    #     TelegraphArticlePublisher(),
+    #     store_ids,
+    #     categories,
+    # )
 
-    chat_id = tg_config["chat_id"]
-    api_token = tg_config["bot_api_token"]
-
-    tg_post_creator = TelegramPostCreator(
-        TelegraphHtmlArticleCreator(Path("patterns")),
-        TelegraphArticlePublisher(),
-        store_ids,
-        categories,
-    )
-
-    tg_publisher = TelegramBotPublisher(tg_post_creator, chat_id, api_token)
+    # tg_publisher = TelegramBotPublisher(tg_post_creator, chat_id, api_token)
 
     books = read_books()
 
-    tg_publisher.publish(books)
+    print(books.head(2))
+
+    # tg_publisher.publish(books)
