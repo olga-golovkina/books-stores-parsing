@@ -30,14 +30,8 @@ class TelegramPostCreator(PostCreator):
 
         store_id = self.__store_cfg[store]
 
-        print("All books", books.head(2), sep="\n")
-        print("DataFrame info", books.info())
-        print("Store id", store_id)
-
         books_of_store = books[books["store_id"] == store_id]
         books_count = len(books_of_store.index)
-
-        print("Books of store count:", books_count)
 
         if books_count == 0:
             return None
@@ -53,8 +47,6 @@ class TelegramPostCreator(PostCreator):
                 books_of_store["category_id"] == category_id
             ]
             books_count = len(books_by_category.index)
-
-            print("Books of category count:", books_count)
 
             if books_count == 0:
                 continue
@@ -78,7 +70,7 @@ class TelegramPostCreator(PostCreator):
         title = self.__create_title(date_now)
         content = (
             """
-"""
+    """
             * 2
         ).join(
             filter(
@@ -94,7 +86,7 @@ class TelegramPostCreator(PostCreator):
             title
             + (
                 """
-"""
+        """
                 * 2
             )
             + content
