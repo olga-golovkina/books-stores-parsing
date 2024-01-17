@@ -19,7 +19,9 @@ def read_books() -> DataFrame:
     path_cfg = compose("path_config")
     spark_path = Path(path_cfg["spark_books"])
 
-    books = spark_session.read.option("mergeSchema", "true").parquet(spark_path)
+    books = spark_session.read.option("mergeSchema", "true").parquet(
+        spark_path.absolute()
+    )
 
     return books.toPandas()
 
