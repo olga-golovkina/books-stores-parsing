@@ -1,6 +1,5 @@
 from hydra import compose, initialize
 from pyspark.sql import SparkSession
-from pyspark.sql.types import StructType
 
 from books_stores_parsing.parsing import parse
 
@@ -12,22 +11,9 @@ def run_spark():
 
     path_cfg = compose(config_name="path_config")
 
-    schema = (
-        StructType()
-        .add("date", "string")
-        .add("store_id", "integer")
-        .add("url", "string")
-        .add("title", "string")
-        .add("img_url", "string")
-        .add("author", "string")
-        .add("isbn", "string")
-        .add("description", "string")
-        .add("rating", "float")
-        .add("price", "integer")
-        .add("category_id", "integer")
+    books = spark_session.read.option("header", "true").csv(
+        path_cfg["hadoop_books"], sep=";"
     )
-
-    books = spark_session.read.csv(path_cfg["hadoop_books"], sep=";", schema=schema)
     books.show(2)
 
     # books.repartition("date", "store_id").write.mode("overwrite").partitionBy(
