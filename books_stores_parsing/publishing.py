@@ -31,7 +31,7 @@ def publish():
     if not GlobalHydra.instance().is_initialized():
         initialize(
             version_base=None,
-            config_path="configs",
+            config_path="../configs",
             job_name="books_stores_parsing",
         )
 
@@ -43,7 +43,7 @@ def publish():
     api_token = tg_config["bot_api_token"]
 
     tg_post_creator = TelegramPostCreator(
-        TelegraphHtmlArticleCreator(Path("../patterns")),
+        TelegraphHtmlArticleCreator(Path("patterns")),
         TelegraphArticlePublisher(),
         store_ids,
         categories,
