@@ -30,6 +30,10 @@ class TelegramPostCreator(PostCreator):
 
         store_id = self.__store_cfg[store]
 
+        print("All books", books.head(2), sep="\n")
+        print("DataFrame info", books.info())
+        print("Store id", store_id)
+
         books_of_store = books[books["store_id"] == store_id]
         books_count = len(books_of_store.index)
 
