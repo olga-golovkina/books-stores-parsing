@@ -17,11 +17,12 @@ def run_spark():
         .csv(path_cfg["hadoop_books"], sep=";")
     )
 
+    print("Exporting example")
     books.show(1)
 
-    # books.repartition("date", "store_id").write.mode("overwrite").partitionBy(
-    #     "date", "store_id"
-    # ).format("parquet").option("header", "true").save(path_cfg["spark_books"])
+    books.repartition("date", "store_id").write.mode("overwrite").partitionBy(
+        "date", "store_id"
+    ).format("parquet").option("header", "true").save(path_cfg["spark_books"])
 
 
 def main():
