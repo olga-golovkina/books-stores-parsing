@@ -31,12 +31,7 @@ def publish():
     if not GlobalHydra.instance().is_initialized():
         initialize(
             version_base=None,
-            config_path="/home"
-            "/o_golovkina"
-            "/project"
-            "/source_code"
-            "/books-stores-parsing"
-            "/configs/",
+            config_path="./configs/",
             job_name="books_stores_parsing",
         )
 
