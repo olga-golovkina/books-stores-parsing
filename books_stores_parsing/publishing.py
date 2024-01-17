@@ -9,21 +9,22 @@ from pyspark.sql import SparkSession
 # from books_stores_parsing.telegram.post_creator import TelegramPostCreator
 # from books_stores_parsing.telegraph.article_creator import TelegraphHtmlArticleCreator
 # from books_stores_parsing.telegraph.article_publisher import TelegraphArticlePublisher
+from pyspark.sql.types import DateType, FloatType, IntegerType, StringType
 
 
 def create_schema():
     return (
         StructType()
-        .add("datetime", "datetime")
-        .add("store_id", "integer")
-        .add("url", "string")
-        .add("title", "string")
-        .add("img_url", "string")
-        .add("isbn", "string")
-        .add("description", "string")
-        .add("rating", "float")
-        .add("price", "integer")
-        .add("category_id", "integer")
+        .add("datetime", DateType())
+        .add("store_id", IntegerType())
+        .add("url", StringType())
+        .add("title", StringType())
+        .add("img_url", StringType())
+        .add("isbn", StringType())
+        .add("description", StringType())
+        .add("rating", FloatType())
+        .add("price", IntegerType())
+        .add("category_id", IntegerType())
     )
 
 
