@@ -8,6 +8,7 @@ from hydra import compose, initialize
 # from pyspark import RDD, SparkContext
 from pyspark import RDD
 from pyspark.sql import SparkSession
+from pyspark.sql.types import StructType
 
 from parsing import parse
 
@@ -44,9 +45,30 @@ def run_spark():
 
     path_cfg = compose(config_name="path_config")
 
-    df = spark_session.read.csv(path_cfg["hadoop_books"])
+    schema = (
+        StructType()
+        .add("timestamp", "float")
+        .add("store_id", "integer")
+        .add("url", "string")
+        .add("title", "string")
+        .add("img_url", "string")
+        .add("author", "string")
+        .add("isbn", "string")
+        .add("description", "string")
+        .add("rating", "float")
+        .add("price", "integer")
+        .add("category_id", "integer")
+    )
 
-    print(df)
+    books = spark_session.read.csv(path_cfg["hadoop_books"], sep=";", schema=schema)
+
+    print(books)
+
+    books.repartition(2).write().mode("overwrite").partitionBy(
+        "store_id", "category_id"
+    ).format("parquet").option("compression", "snappy").save(path_cfg["spark_books"])
+
+    print("Done")
 
     # stream_ctx = StreamingContext(spark_ctx, 1)
     #
