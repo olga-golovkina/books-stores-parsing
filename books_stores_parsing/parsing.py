@@ -1,4 +1,3 @@
-# import os
 from pathlib import Path
 from subprocess import PIPE, Popen
 
@@ -31,7 +30,7 @@ def parse():
             version_base=None, config_path="../configs", job_name="books_stores_parsing"
         )
 
-    # path_cfg = compose(config_name="path_config")
+    path_cfg = compose(config_name="path_config")
 
     category_ids = compose(config_name="book_categories")
     store_ids = compose(config_name="store_ids")
@@ -55,25 +54,27 @@ def parse():
         thread.join()
 
     res = pd.concat(
-        [thread.get_result() for thread in threads if thread.get_result() is not None]
+        [
+            thread.get_result()
+            for thread in threads
+            if thread.get_result() is not None and len(thread.get_result().index) > 0
+        ]
     ).reset_index(drop=True)
 
-    res.to_csv("./output/books.txt", index=False, sep=";")
+    books_path = Path(path_cfg["parsed_books"])
+    hadoop_books_path = Path(path_cfg["hadoop_books"])
 
-    # books_path = Path(path_cfg["parsed_books"])
-    # hadoop_books_path = Path(path_cfg["hadoop_books"])
-    #
-    # # res.to_csv(books_path, index=False, sep=";")
-    #
-    # create_hadoop_directory(hadoop_books_path.parents[0])
-    # create_hadoop_directory(Path(path_cfg["spark_books"]))
-    #
-    # put = Popen(
-    #     ["hdfs", "dfs", "-put", "-f", books_path, hadoop_books_path],
-    #     stdin=PIPE,
-    #     bufsize=-1,
-    # )
-    # put.communicate()
+    res.to_csv(books_path, index=False, sep=";")
+
+    create_hadoop_directory(hadoop_books_path.parents[0])
+    create_hadoop_directory(Path(path_cfg["spark_books"]))
+
+    put = Popen(
+        ["hdfs", "dfs", "-put", "-f", books_path, hadoop_books_path],
+        stdin=PIPE,
+        bufsize=-1,
+    )
+    put.communicate()
 
 
 if __name__ == "__main__":
