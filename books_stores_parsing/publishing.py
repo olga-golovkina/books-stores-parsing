@@ -43,7 +43,7 @@ def publish():
     api_token = tg_config["bot_api_token"]
 
     tg_post_creator = TelegramPostCreator(
-        TelegraphHtmlArticleCreator(Path("../patterns")),
+        TelegraphHtmlArticleCreator(Path("patterns")),
         TelegraphArticlePublisher(),
         store_ids,
         categories,
