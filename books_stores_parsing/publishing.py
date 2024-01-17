@@ -14,16 +14,17 @@ from pyspark.sql.types import DateType, FloatType, IntegerType, StringType, Stru
 def create_schema():
     return (
         StructType()
-        .add("datetime", DateType())
-        .add("store_id", IntegerType())
-        .add("url", StringType())
-        .add("title", StringType())
-        .add("img_url", StringType())
-        .add("isbn", StringType())
-        .add("description", StringType())
-        .add("rating", FloatType())
-        .add("price", IntegerType())
-        .add("category_id", IntegerType())
+        .add("date", DateType(), False)
+        .add("store_id", IntegerType(), False)
+        .add("url", StringType(), False)
+        .add("title", StringType(), False)
+        .add("img_url", StringType(), False)
+        .add("author", StringType(), False)
+        .add("isbn", StringType(), True)
+        .add("description", StringType(), False)
+        .add("rating", FloatType(), False)
+        .add("price", IntegerType(), False)
+        .add("category_id", IntegerType(), False)
     )
 
 
