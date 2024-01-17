@@ -14,7 +14,7 @@ def run_spark():
 
     schema = (
         StructType()
-        .add("timestamp", "float")
+        .add("date", "string")
         .add("store_id", "integer")
         .add("url", "string")
         .add("title", "string")
