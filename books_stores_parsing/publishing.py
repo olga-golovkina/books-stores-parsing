@@ -18,6 +18,9 @@ def read_books() -> DataFrame:
 
     path_cfg = compose(config_name="path_config")
 
+    print("Hadoop path:")
+    print(path_cfg["hadoop_books"])
+
     books = (
         spark_session.read.option("header", "True")
         .option("delimiter", ";")
